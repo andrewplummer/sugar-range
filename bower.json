@@ -1,6 +1,6 @@
 {
   "name": "sugar-range",
-  "description": "A Javascript utility library for working with native objects. Range module.",
+  "description": "Range module for the Sugar Javascript utility library.",
   "homepage": "https://sugarjs.com/",
   "license": "MIT",
   "authors": [
