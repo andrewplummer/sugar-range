@@ -1,5 +1,5 @@
 /*
- *  Sugar v2.0.0
+ *  Sugar v2.0.2
  *
  *  Freely distributable and licensed under the MIT-style license.
  *  Copyright (c) Andrew Plummer
@@ -94,9 +94,9 @@
   }
 
   /***
-   * @method createNamespace(<name>)
-   * @returns Namespace
-   * @global
+   * @method createNamespace(name)
+   * @returns SugarNamespace
+   * @namespace Sugar
    * @short Creates a new Sugar namespace.
    * @extra This method is for plugin developers who want to define methods to be
    *        used with natives that Sugar does not handle by default. The new
@@ -109,6 +109,8 @@
    *
    *   Sugar.createNamespace('Boolean');
    *
+   * @param {string} name - The namespace name.
+   *
    ***/
   function createNamespace(name) {
 
@@ -119,14 +121,13 @@
     var sugarNamespace = getNewChainableClass(name, true);
 
     /***
-     * @method extend([options])
+     * @method extend([opts])
      * @returns Sugar
-     * @global
-     * @namespace
+     * @namespace Sugar
      * @short Extends Sugar defined methods onto natives.
      * @extra This method can be called on individual namespaces like
      *        `Sugar.Array` or on the `Sugar` global itself, in which case
-     *        [options] will be forwarded to each `extend` call. For more,
+     *        [opts] will be forwarded to each `extend` call. For more,
      *        see `extending`.
      *
      * @options
@@ -158,6 +159,22 @@
      *
      *   Sugar.Array.extend();
      *   Sugar.extend();
+     *
+     * @option {Array<string>} [methods]
+     * @option {Array<string|NativeConstructor>} [except]
+     * @option {Array<NativeConstructor>} [namespaces]
+     * @option {boolean} [enhance]
+     * @option {boolean} [enhanceString]
+     * @option {boolean} [enhanceArray]
+     * @option {boolean} [objectPrototype]
+     * @param {ExtendOptions} [opts]
+     *
+     ***
+     * @method extend([opts])
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
+     * @short Extends Sugar defined methods for a specific namespace onto natives.
+     * @param {ExtendOptions} [opts]
      *
      ***/
     var extend = function (opts) {
@@ -255,7 +272,7 @@
         // methods, so add a flag here to check later.
         setProperty(sugarNamespace, 'active', true);
       }
-      return Sugar;
+      return sugarNamespace;
     };
 
     function defineWithOptionCollect(methodName, instance, args) {
@@ -267,9 +284,9 @@
     }
 
     /***
-     * @method defineStatic(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineStatic(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines static methods on the namespace that can later be extended
      *        onto the native globals.
      * @extra Accepts either a single object mapping names to functions, or name
@@ -285,13 +302,17 @@
      *     }
      *   });
      *
+     * @signature defineStatic(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     defineWithOptionCollect('defineStatic', STATIC);
 
     /***
-     * @method defineInstance(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineInstance(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines methods on the namespace that can later be extended as
      *        instance methods onto the native prototype.
      * @extra Accepts either a single object mapping names to functions, or name
@@ -315,13 +336,17 @@
      *     }
      *   });
      *
+     * @signature defineInstance(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     defineWithOptionCollect('defineInstance', INSTANCE);
 
     /***
-     * @method defineInstanceAndStatic(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineInstanceAndStatic(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short A shortcut to define both static and instance methods on the namespace.
      * @extra This method is intended for use with `Object` instance methods. Sugar
      *        will not map any methods to `Object.prototype` by default, so defining
@@ -335,14 +360,18 @@
      *     }
      *   });
      *
+     * @signature defineInstanceAndStatic(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     defineWithOptionCollect('defineInstanceAndStatic', INSTANCE | STATIC);
 
 
     /***
-     * @method defineStaticWithArguments(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineStaticWithArguments(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines static methods that collect arguments.
      * @extra This method is identical to `defineStatic`, except that when defined
      *        methods are called, they will collect any arguments past `n - 1`,
@@ -361,13 +390,17 @@
      *     }
      *   });
      *
+     * @signature defineStaticWithArguments(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     defineWithOptionCollect('defineStaticWithArguments', STATIC, true);
 
     /***
-     * @method defineInstanceWithArguments(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineInstanceWithArguments(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines instance methods that collect arguments.
      * @extra This method is identical to `defineInstance`, except that when
      *        defined methods are called, they will collect any arguments past
@@ -386,13 +419,17 @@
      *     }
      *   });
      *
+     * @signature defineInstanceWithArguments(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     defineWithOptionCollect('defineInstanceWithArguments', INSTANCE, true);
 
     /***
-     * @method defineStaticPolyfill(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineStaticPolyfill(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines static methods that are mapped onto the native if they do
      *        not already exist.
      * @extra Intended only for use creating polyfills that follow the ECMAScript
@@ -407,16 +444,21 @@
      *     }
      *   });
      *
+     * @signature defineStaticPolyfill(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     setProperty(sugarNamespace, 'defineStaticPolyfill', function(arg1, arg2, arg3) {
       var opts = collectDefineOptions(arg1, arg2, arg3);
       extendNative(globalContext[name], opts.methods, true, opts.last);
+      return sugarNamespace;
     });
 
     /***
-     * @method defineInstancePolyfill(...)
-     * @returns Namespace
-     * @namespace
+     * @method defineInstancePolyfill(methods)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Defines instance methods that are mapped onto the native prototype
      *        if they do not already exist.
      * @extra Intended only for use creating polyfills that follow the ECMAScript
@@ -434,6 +476,10 @@
      *     }
      *   });
      *
+     * @signature defineInstancePolyfill(methodName, methodFn)
+     * @param {Object} methods - Methods to be defined.
+     * @param {string} methodName - Name of a single method to be defined.
+     * @param {Function} methodFn - Function body of a single method to be defined.
      ***/
     setProperty(sugarNamespace, 'defineInstancePolyfill', function(arg1, arg2, arg3) {
       var opts = collectDefineOptions(arg1, arg2, arg3);
@@ -442,22 +488,27 @@
       forEachProperty(opts.methods, function(fn, methodName) {
         defineChainableMethod(sugarNamespace, methodName, fn);
       });
+      return sugarNamespace;
     });
 
     /***
-     * @method alias(<toName>, <fromName>)
-     * @returns Namespace
-     * @namespace
+     * @method alias(toName, from)
+     * @returns SugarNamespace
+     * @namespace SugarNamespace
      * @short Aliases one Sugar method to another.
      *
      * @example
      *
      *   Sugar.Array.alias('all', 'every');
      *
+     * @signature alias(toName, fn)
+     * @param {string} toName - Name for new method.
+     * @param {string|Function} from - Method to alias, or string shortcut.
      ***/
     setProperty(sugarNamespace, 'alias', function(name, source) {
       var method = typeof source === 'string' ? sugarNamespace[source] : source;
       setMethod(sugarNamespace, name, method);
+      return sugarNamespace;
     });
 
     // Each namespace can extend only itself through its .extend method.
@@ -1052,11 +1103,20 @@
       return obj[name];
     }
 
-    function setOption(name, val) {
-      if (val === null) {
-        val = defaults[name];
+    function setOption(arg1, arg2) {
+      var options;
+      if (arguments.length === 1) {
+        options = arg1;
+      } else {
+        options = {};
+        options[arg1] = arg2;
       }
-      obj[name] = val;
+      forEachProperty(options, function(val, name) {
+        if (val === null) {
+          val = defaults[name];
+        }
+        obj[name] = val;
+      });
     }
 
     defineAccessor(namespace, 'getOption', getOption);
@@ -2211,11 +2271,11 @@
 
     /***
      *
-     * @method isArray(<obj>)
+     * @method isArray(obj)
      * @returns Boolean
      * @polyfill ES5
      * @static
-     * @short Returns true if <obj> is an Array.
+     * @short Returns true if `obj` is an Array.
      *
      * @example
      *
@@ -2290,13 +2350,13 @@
     },
 
     /***
-     * @method indexOf(<search>, [fromIndex] = 0)
+     * @method indexOf(search, [fromIndex] = 0)
      * @returns Number
      * @polyfill ES5
-     * @short Searches the array and returns the first index where <search> occurs,
+     * @short Searches the array and returns the first index where `search` occurs,
      *        or `-1` if the element is not found.
      * @extra [fromIndex] is the index from which to begin the search. This
-     *        method performs a simple strict equality comparison on <search>.
+     *        method performs a simple strict equality comparison on `search`.
      *        Sugar does not enhance this method to support `enhanced matching`.
      *        For such functionality, use the `findIndex` method instead.
      *
@@ -2314,13 +2374,13 @@
     },
 
     /***
-     * @method lastIndexOf(<search>, [fromIndex] = array.length - 1)
+     * @method lastIndexOf(search, [fromIndex] = array.length - 1)
      * @returns Number
      * @polyfill ES5
      * @short Searches the array from the end and returns the first index where
-     *        <search> occurs, or `-1` if the element is not found.
+     *        `search` occurs, or `-1` if the element is not found.
      * @extra [fromIndex] is the index from which to begin the search. This method
-     *        performs a simple strict equality comparison on <search>.
+     *        performs a simple strict equality comparison on `search`.
      *        Sugar does not enhance this method to support `enhanced matching`.
      *
      * @example
@@ -2369,23 +2429,23 @@
     },
 
     /***
-     * @method reduce(<fn>, [init])
+     * @method reduce(fn, [init])
      * @returns Mixed
      * @polyfill ES5
      * @short Reduces the array to a single result.
      * @extra This operation is sometimes called "accumulation", as it takes the
-     *        result of the last iteration of <fn> and passes it as the first
+     *        result of the last iteration of `fn` and passes it as the first
      *        argument to the next iteration, "accumulating" that value as it goes.
      *        The return value of this method will be the return value of the final
-     *        iteration of <fn>. If [init] is passed, it will be the initial
+     *        iteration of `fn`. If [init] is passed, it will be the initial
      *        "accumulator" (the first argument). If [init] is not passed, then it
-     *        will take the first element in the array, and <fn> will not be called
+     *        will take the first element in the array, and `fn` will not be called
      *        for that element.
      *
      * @callback fn
      *
      *   acc  The "accumulator". Either [init], the result of the last iteration
-     *        of <fn>, or the first element of the array.
+     *        of `fn`, or the first element of the array.
      *   el   The current element for this iteration.
      *   idx  The current index for this iteration.
      *   arr  A reference to the array.
@@ -2416,7 +2476,7 @@
      * @callback fn
      *
      *   acc  The "accumulator", either [init], the result of the last iteration
-     *        of <fn>, or the last element of the array.
+     *        of `fn`, or the last element of the array.
      *   el   The current element for this iteration.
      *   idx  The current index for this iteration.
      *   arr  A reference to the array.
@@ -2473,10 +2533,10 @@
   defineInstancePolyfill(sugarFunction, {
 
      /***
-     * @method bind(<context>, [arg1], ...)
+     * @method bind(context, [arg1], ...)
      * @returns Function
      * @polyfill ES5
-     * @short Binds <context> as the `this` object for the function when it is
+     * @short Binds `context` as the `this` object for the function when it is
      *        called. Also allows currying an unlimited number of parameters.
      * @extra "currying" means setting parameters ([arg1], [arg2], etc.) ahead of
      *        time so that they are passed when the function is called later. If
@@ -2809,9 +2869,9 @@
     },
 
     /***
-     * @method contains(<obj>)
+     * @method contains(el)
      * @returns Boolean
-     * @short Returns true if <obj> is contained inside the range. <obj> may be a
+     * @short Returns true if `el` is contained inside the range. `el` may be a
      *        value or another range.
      *
      * @example
@@ -2822,28 +2882,30 @@
      *   janToMay.contains(marToAug)             -> false
      *   janToMay.contains(febToApr)             -> true
      *
+     * @param {RangeElement} el
+     *
      ***/
-    'contains': function(obj) {
-      if (obj == null) return false;
-      if (obj.start && obj.end) {
-        return obj.start >= this.start && obj.start <= this.end &&
-               obj.end   >= this.start && obj.end   <= this.end;
+    'contains': function(el) {
+      if (el == null) return false;
+      if (el.start && el.end) {
+        return el.start >= this.start && el.start <= this.end &&
+               el.end   >= this.start && el.end   <= this.end;
       } else {
-        return obj >= this.start && obj <= this.end;
+        return el >= this.start && el <= this.end;
       }
     },
 
     /***
-     * @method every(<amount>, [fn])
+     * @method every(amount, [fn])
      * @returns Array
-     * @short Iterates through the range by <amount>, calling [fn] for each step.
+     * @short Iterates through the range by `amount`, calling [fn] for each step.
      * @extra Returns an array of each increment visited. For date ranges,
-     *        <amount> can also be a string like `"2 days"`. This will step
+     *        `amount` can also be a string like `"2 days"`. This will step
      *        through the range by incrementing a date object by that specific
      *        unit, and so is generally preferable for vague units such as
      *        `"2 months"`.
      *
-     * @callback fn
+     * @callback rangeEveryFn
      *
      *   el   The element of the current iteration.
      *   i    The index of the current iteration.
@@ -2857,6 +2919,12 @@
      *   sepToOct.every('week', function() {
      *     // Will be called every week from September to October
      *   })
+     *
+     * @param {string|number} amount
+     * @param {rangeEveryFn} [fn]
+     * @callbackParam {RangeElement} el
+     * @callbackParam {number} i
+     * @callbackParam {Range} r
      *
      ***/
     'every': function(amount, fn) {
@@ -2881,7 +2949,7 @@
     },
 
     /***
-     * @method union(<range>)
+     * @method union(range)
      * @returns Range
      * @short Returns a new range with the earliest starting point as its start,
      *        and the latest ending point as its end. If the two ranges do not
@@ -2892,6 +2960,8 @@
      *   oneToTen.union(fiveToTwenty) -> 1..20
      *   janToMay.union(marToAug)     -> Jan 1, xxxx..Aug 1, xxxx
      *
+     * @param {Range} range
+     *
      ***/
     'union': function(range) {
       return new Range(
@@ -2901,7 +2971,7 @@
     },
 
     /***
-     * @method intersect(<range>)
+     * @method intersect(range)
      * @returns Range
      * @short Returns a new range with the latest starting point as its start,
      *        and the earliest ending point as its end. If the two ranges do not
@@ -2911,6 +2981,8 @@
      *
      *   oneToTen.intersect(fiveToTwenty) -> 5..10
      *   janToMay.intersect(marToAug)     -> Mar 1, xxxx..May 1, xxxx
+     *
+     * @param {Range} range
      *
      ***/
     'intersect': function(range) {
@@ -2939,18 +3011,20 @@
     },
 
     /***
-     * @method clamp(<obj>)
+     * @method clamp(el)
      * @returns Mixed
-     * @short Clamps <obj> to be within the range if it falls outside.
+     * @short Clamps `el` to be within the range if it falls outside.
      *
      * @example
      *
      *   Number.range(1, 5).clamp(8)     -> 5
      *   janToMay.clamp(aug) -> May 1, xxxx
      *
+     * @param {RangeElement} el
+     *
      ***/
-    'clamp': function(obj) {
-      return rangeClamp(this, obj);
+    'clamp': function(el) {
+      return rangeClamp(this, el);
     }
 
   });
@@ -2972,6 +3046,9 @@
      *   Number.range(5, 10)
      *   Number.range(20, 15)
      *
+     * @param {number} [start]
+     * @param {number} [end]
+     *
      ***/
     'range': PrimitiveRangeConstructor
 
@@ -2980,13 +3057,13 @@
   defineInstance(sugarNumber, {
 
     /***
-     * @method upto(<num>, [step] = 1, [fn])
+     * @method upto(num, [step] = 1, [fn])
      * @returns Array
-     * @short Returns an array containing numbers from the number up to <num>.
+     * @short Returns an array containing numbers from the number up to `num`.
      * @extra Optionally calls [fn] for each number in that array. [step] allows
      *        multiples other than 1. [fn] can be passed in place of [step].
      *
-     * @callback fn
+     * @callback rangeEveryFn
      *
      *   el   The element of the current iteration.
      *   i    The index of the current iteration.
@@ -2999,6 +3076,14 @@
      *     // This function is called 5 times receiving n as the value.
      *   });
      *   (2).upto(8, 2) -> [2, 4, 6, 8]
+     *
+     * @signature upto(num, [fn])
+     * @param {number} num
+     * @param {number} [step]
+     * @param {rangeEveryFn} [fn]
+     * @callbackParam {RangeElement} el
+     * @callbackParam {number} i
+     * @callbackParam {Range} r
      *
      ***/
     'upto': function(n, num, step, fn) {
@@ -3017,6 +3102,9 @@
      *   (3).clamp(50, 100)  -> 50
      *   (85).clamp(50, 100) -> 85
      *
+     * @param {number} [start]
+     * @param {number} [end]
+     *
      ***/
     'clamp': function(n, start, end) {
       return rangeClamp(new Range(start, end), n);
@@ -3032,6 +3120,8 @@
      *
      *   (100).cap(80) -> 80
      *
+     * @param {number} [max]
+     *
      ***/
     'cap': function(n, max) {
       return rangeClamp(new Range(undefined, max), n);
@@ -3040,13 +3130,13 @@
   });
 
   /***
-   * @method downto(<num>, [step] = 1, [fn])
+   * @method downto(num, [step] = 1, [fn])
    * @returns Array
-   * @short Returns an array containing numbers from the number down to <num>.
+   * @short Returns an array containing numbers from the number down to `num`.
    * @extra Optionally calls [fn] for each number in that array. [step] allows
    *        multiples other than 1. [fn] can be passed in place of [step].
    *
-   * @callback fn
+   * @callback rangeEveryFn
    *
    *   el   The element of the current iteration.
    *   i    The index of the current iteration.
@@ -3059,6 +3149,14 @@
    *     // This function is called 6 times receiving n as the value.
    *   });
    *   (8).downto(2, 2) -> [8, 6, 4, 2]
+   *
+   * @signature upto(num, [fn])
+   * @param {number} num
+   * @param {number} [step]
+   * @param {rangeEveryFn} [fn]
+   * @callbackParam {RangeElement} el
+   * @callbackParam {number} i
+   * @callbackParam {Range} r
    *
    ***/
   alias(sugarNumber, 'downto', 'upto');
@@ -3079,6 +3177,9 @@
      *
      *   String.range('a', 'z')
      *   String.range('t', 'm')
+     *
+     * @param {string} [start]
+     * @param {string} [end]
      *
      ***/
     'range': PrimitiveRangeConstructor
@@ -3190,6 +3291,7 @@
     /***
      * @method range([start], [end])
      * @returns Range
+     * @namespace Date
      * @static
      * @short Creates a new date range between [start] and [end].
      * @extra Arguments may be either dates or strings which will be forwarded to
@@ -3208,6 +3310,9 @@
      *   Date.range('Monday to Friday')
      *   Date.range('tomorrow from 3pm to 5pm')
      *   Date.range('1 hour starting at 5pm Tuesday')
+     *
+     * @param {string|Date} [start]
+     * @param {string|Date} [end]
      *
      ***/
     'range': DateRangeConstructor
