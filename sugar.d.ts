@@ -1,10 +1,9 @@
-// Type definitions for Sugar v2.0.2
+// Type definitions for Sugar v2.0.3
 // Project: https://sugarjs.com/
 // Definitions by: Andrew Plummer <plummer.andrew@gmail.com>
 
-declare module sugarjs {
+declare namespace sugarjs {
 
-  type DisambiguationFunction = Function;
   type SugarDefaultChainable<RawValue> = Array.Chainable<any, RawValue> &
                                          Date.Chainable<RawValue> &
                                          Function.Chainable<RawValue> &
@@ -12,6 +11,7 @@ declare module sugarjs {
                                          Object.Chainable<RawValue> &
                                          RegExp.Chainable<RawValue> &
                                          String.Chainable<RawValue>;
+
   type NativeConstructor = ArrayConstructor |
                            DateConstructor |
                            FunctionConstructor |
@@ -86,7 +86,7 @@ declare module sugarjs {
     extend(opts?: ExtendOptions): this;
   }
 
-  module Array {
+  namespace Array {
 
     type Chainable<T, RawValue> = ChainableBase<T, RawValue> & Object.ChainableBase<RawValue>;
 
@@ -126,7 +126,7 @@ declare module sugarjs {
 
   }
 
-  module Date {
+  namespace Date {
 
     type Chainable<RawValue> = ChainableBase<RawValue> & Object.ChainableBase<RawValue>;
 
@@ -186,7 +186,7 @@ declare module sugarjs {
 
   }
 
-  module Function {
+  namespace Function {
 
     type Chainable<RawValue> = ChainableBase<RawValue> & Object.ChainableBase<RawValue>;
 
@@ -201,7 +201,7 @@ declare module sugarjs {
 
   }
 
-  module Number {
+  namespace Number {
 
     type Chainable<RawValue> = ChainableBase<RawValue> & Object.ChainableBase<RawValue>;
 
@@ -233,7 +233,7 @@ declare module sugarjs {
 
   }
 
-  module Object {
+  namespace Object {
 
     type Chainable<RawValue> = ChainableBase<RawValue>;
 
@@ -245,7 +245,7 @@ declare module sugarjs {
 
   }
 
-  module RegExp {
+  namespace RegExp {
 
     type Chainable<RawValue> = ChainableBase<RawValue> & Object.ChainableBase<RawValue>;
 
@@ -259,7 +259,7 @@ declare module sugarjs {
 
   }
 
-  module String {
+  namespace String {
 
     type Chainable<RawValue> = ChainableBase<RawValue> & Object.ChainableBase<RawValue>;
 
@@ -321,6 +321,11 @@ declare module sugarjs {
 
   }
 
+}
+
+declare module "sugar" {
+  const Sugar: sugarjs.Sugar;
+  export = Sugar;
 }
 
 declare var Sugar: sugarjs.Sugar;
